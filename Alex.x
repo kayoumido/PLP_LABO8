@@ -12,8 +12,8 @@ $white+ ;
 let { \s -> TLet }
 in { \s -> TIn }
 $digit+ { \s -> TInt (read s) }
-"<=" {\s -> TOp s}
-[\=\+\*\(\)] { \s -> TSym (head s) }
+"<=" | "+=" | ">=" | "=" { \s -> TOp s}
+-- [\=\+\*\(\)] { \s -> TSym (head s) }
 $alpha+ { \s -> TVar s }
 {
 -- Définition du type Token.
