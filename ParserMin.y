@@ -58,8 +58,8 @@ Exp : let var "=" Exp in Exp { Let $2 $4 $6 }
 | var { Var $1 }
 
 -- Règles pour une liste d'expression
-Exps : Exp { [$1] }
-| Exp "," Exps { $1:$3 } -- retourne une liste d'expression
+Exps : Exp { [ $1] }
+| Exp "," Exps {  $1 :$3 } -- retourne une liste d'expression
 
 {
 parseError :: [Token] -> a

@@ -360,7 +360,7 @@ happyReduction_11 _  = notHappyAtAll
 happyReduce_12 = happySpecReduce_1  5 happyReduction_12
 happyReduction_12 (HappyAbsSyn4  happy_var_1)
 	 =  HappyAbsSyn5
-		 ([happy_var_1]
+		 ([ happy_var_1]
 	)
 happyReduction_12 _  = notHappyAtAll 
 
@@ -369,7 +369,7 @@ happyReduction_13 (HappyAbsSyn5  happy_var_3)
 	_
 	(HappyAbsSyn4  happy_var_1)
 	 =  HappyAbsSyn5
-		 (happy_var_1:happy_var_3
+		 (happy_var_1 :happy_var_3
 	)
 happyReduction_13 _ _ _  = notHappyAtAll 
 
@@ -434,6 +434,7 @@ happySeq = happyDontSeq
 
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
+
 -- Définition du type Exp utilisé pour construire l'arbre syntaxique.
 data Exp = Let Name Exp Exp | Bin [Char] Exp Exp | Cst Int | Var Name | If Exp Exp Exp | Func Name [Exp] deriving Show
 {-# LINE 1 "templates/GenericTemplate.hs" #-}

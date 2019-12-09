@@ -1835,7 +1835,7 @@ alex_actions = array (0 :: Int, 19)
   , (0,alex_action_9)
   ]
 
-{-# LINE 23 "LexerMin.x" #-}
+{-# LINE 33 "LexerMin.x" #-}
 
 -- Définition du type Token.
 type Name = [Char]
