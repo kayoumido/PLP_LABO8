@@ -1,12 +1,14 @@
 module Lab8 where
 
 import           Data.Char
+import           LexerMin
+import           ParserMin
+
 type Op = [Char]
 
-type Name = [Char]
-data Exp = Cst Int | Bin Op Exp Exp | Un Op Exp | If Exp Exp Exp |
-    Var Name | Let Name Exp Exp | Func Name [Exp] | Def Name [Name] Exp deriving (Show)
-
+-- type Name = [Char]
+-- data Exp = Cst Int | Bin Op Exp Exp | Un Op Exp | If Exp Exp Exp |
+--     Var Name | Let Name Exp Exp | Func Name [Exp] | Def Name [Name] Exp deriving (Show)
 value name (vars, _) = value' name vars
   where
     value' name [] = error $ "Undefined variable: " ++ name
@@ -40,7 +42,7 @@ eval (Bin "-" a b) env = (eval a env) - (eval b env)
 eval (Bin "*" a b) env = (eval a env) * (eval b env)
 eval (Bin "<" a b) env = bool (<) (eval a env) (eval b env)
 eval (Bin "<=" a b) env = bool (<=) (eval a env) (eval b env)
-eval (Un "-" a) env     = - eval a env
+-- eval (Un "-" a) env     = - eval a env
 eval (If p ifTrue ifFalse) env
   | eval p env < 1 = eval ifFalse env
   | otherwise = eval ifTrue env
@@ -49,21 +51,20 @@ eval (Func func xs) env = eval body $ expand env vars xs
   where
     (vars, body) = extract func env
 
-lexer [] = []
-lexer (c:cs)
-    | isSpace c = lexer cs
-    | isAlpha c = lexSym (c:cs)
-    | isDigit c = lexInt (c:cs)
-lexer ('<':'=':cs) = "<=": lexer cs -- <- C MOA KA FÉ (DODO)
-lexer ('<':cs) = "<": lexer cs
-lexer ('-':cs) = "-": lexer cs
-lexer ('+':cs) = "+": lexer cs
-lexer ('=':cs) = "=": lexer cs
-lexInt cs = int : lexer rest
-    where (int, rest) = span isDigit cs
-lexSym cs = symbol : lexer rest
-    where (symbol,rest) = span isAlpha cs
-
+-- lexer [] = []
+-- lexer (c:cs)
+--     | isSpace c = lexer cs
+--     | isAlpha c = lexSym (c:cs)
+--     | isDigit c = lexInt (c:cs)
+-- lexer ('<':'=':cs) = "<=": lexer cs -- <- C MOA KA FÉ (DODO)
+-- lexer ('<':cs) = "<": lexer cs
+-- lexer ('-':cs) = "-": lexer cs
+-- lexer ('+':cs) = "+": lexer cs
+-- lexer ('=':cs) = "=": lexer cs
+-- lexInt cs = int : lexer rest
+--     where (int, rest) = span isDigit cs
+-- lexSym cs = symbol : lexer rest
+--     where (symbol,rest) = span isAlpha cs
 -- TEST --
 plusPetit = (Bin "<" (Cst 5) (Cst 2))
 
@@ -86,3 +87,10 @@ funcs =
 
 env :: ([(Name, Int)], [(Name, [Name], Exp)])
 env = ([("a", 1), ("b", 2), ("c", 3)], funcs)
+
+main = do
+  s <- getLine
+  print $ eval (parser $ lexer s) env
+  if null s
+    then return ()
+    else main

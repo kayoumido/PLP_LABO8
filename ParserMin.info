@@ -12,13 +12,14 @@ Grammar
 	Exp -> Exp "-" Exp                                 (3)
 	Exp -> Exp "*" Exp                                 (4)
 	Exp -> Exp "<=" Exp                                (5)
-	Exp -> Exp ">=" Exp                                (6)
-	Exp -> if Exp then Exp else Exp                    (7)
-	Exp -> func "(" Exps ")"                           (8)
-	Exp -> int                                         (9)
-	Exp -> var                                         (10)
-	Exps -> Exp                                        (11)
-	Exps -> Exp "," Exps                               (12)
+	Exp -> Exp "+=" Exp                                (6)
+	Exp -> Exp ">=" Exp                                (7)
+	Exp -> if Exp then Exp else Exp                    (8)
+	Exp -> func "(" Exps ")"                           (9)
+	Exp -> int                                         (10)
+	Exp -> var                                         (11)
+	Exps -> Exp                                        (12)
+	Exps -> Exp "," Exps                               (13)
 
 -----------------------------------------------------------------------------
 Terminals
@@ -36,6 +37,7 @@ Terminals
 	"-"            { TSym "-" }
 	"*"            { TSym "*" }
 	"<="           { TSym "<=" }
+	"+="           { TSym "+=" }
 	">="           { TSym ">=" }
 	"("            { TSym "(" }
 	")"            { TSym ")" }
@@ -45,8 +47,8 @@ Terminals
 Non-terminals
 -----------------------------------------------------------------------------
 	%start_parser   rule  0
-	Exp             rules 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-	Exps            rules 11, 12
+	Exp             rules 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+	Exps            rules 12, 13
 
 -----------------------------------------------------------------------------
 States
@@ -72,7 +74,7 @@ State 2
 
 	Exp -> let . var "=" Exp in Exp                     (rule 1)
 
-	var            shift, and enter state 15
+	var            shift, and enter state 16
 
 
 State 3
@@ -82,36 +84,39 @@ State 3
 	Exp -> Exp . "-" Exp                                (rule 3)
 	Exp -> Exp . "*" Exp                                (rule 4)
 	Exp -> Exp . "<=" Exp                               (rule 5)
-	Exp -> Exp . ">=" Exp                               (rule 6)
+	Exp -> Exp . "+=" Exp                               (rule 6)
+	Exp -> Exp . ">=" Exp                               (rule 7)
 
 	"+"            shift, and enter state 10
 	"-"            shift, and enter state 11
 	"*"            shift, and enter state 12
 	"<="           shift, and enter state 13
-	">="           shift, and enter state 14
+	"+="           shift, and enter state 14
+	">="           shift, and enter state 15
 	%eof           accept
 
 
 State 4
 
-	Exp -> int .                                        (rule 9)
+	Exp -> int .                                        (rule 10)
 
-	in             reduce using rule 9
-	then           reduce using rule 9
-	else           reduce using rule 9
-	"+"            reduce using rule 9
-	"-"            reduce using rule 9
-	"*"            reduce using rule 9
-	"<="           reduce using rule 9
-	">="           reduce using rule 9
-	")"            reduce using rule 9
-	","            reduce using rule 9
-	%eof           reduce using rule 9
+	in             reduce using rule 10
+	then           reduce using rule 10
+	else           reduce using rule 10
+	"+"            reduce using rule 10
+	"-"            reduce using rule 10
+	"*"            reduce using rule 10
+	"<="           reduce using rule 10
+	"+="           reduce using rule 10
+	">="           reduce using rule 10
+	")"            reduce using rule 10
+	","            reduce using rule 10
+	%eof           reduce using rule 10
 
 
 State 5
 
-	Exp -> if . Exp then Exp else Exp                   (rule 7)
+	Exp -> if . Exp then Exp else Exp                   (rule 8)
 
 	let            shift, and enter state 2
 	int            shift, and enter state 4
@@ -123,31 +128,32 @@ State 5
 
 State 6
 
-	Exp -> var .                                        (rule 10)
+	Exp -> var .                                        (rule 11)
 
-	in             reduce using rule 10
-	then           reduce using rule 10
-	else           reduce using rule 10
-	"+"            reduce using rule 10
-	"-"            reduce using rule 10
-	"*"            reduce using rule 10
-	"<="           reduce using rule 10
-	">="           reduce using rule 10
-	")"            reduce using rule 10
-	","            reduce using rule 10
-	%eof           reduce using rule 10
+	in             reduce using rule 11
+	then           reduce using rule 11
+	else           reduce using rule 11
+	"+"            reduce using rule 11
+	"-"            reduce using rule 11
+	"*"            reduce using rule 11
+	"<="           reduce using rule 11
+	"+="           reduce using rule 11
+	">="           reduce using rule 11
+	")"            reduce using rule 11
+	","            reduce using rule 11
+	%eof           reduce using rule 11
 
 
 State 7
 
-	Exp -> func . "(" Exps ")"                          (rule 8)
+	Exp -> func . "(" Exps ")"                          (rule 9)
 
 	"("            shift, and enter state 8
 
 
 State 8
 
-	Exp -> func "(" . Exps ")"                          (rule 8)
+	Exp -> func "(" . Exps ")"                          (rule 9)
 
 	let            shift, and enter state 2
 	int            shift, and enter state 4
@@ -155,8 +161,8 @@ State 8
 	var            shift, and enter state 6
 	func           shift, and enter state 7
 
-	Exp            goto state 23
-	Exps           goto state 24
+	Exp            goto state 25
+	Exps           goto state 26
 
 State 9
 
@@ -164,15 +170,17 @@ State 9
 	Exp -> Exp . "-" Exp                                (rule 3)
 	Exp -> Exp . "*" Exp                                (rule 4)
 	Exp -> Exp . "<=" Exp                               (rule 5)
-	Exp -> Exp . ">=" Exp                               (rule 6)
-	Exp -> if Exp . then Exp else Exp                   (rule 7)
+	Exp -> Exp . "+=" Exp                               (rule 6)
+	Exp -> Exp . ">=" Exp                               (rule 7)
+	Exp -> if Exp . then Exp else Exp                   (rule 8)
 
-	then           shift, and enter state 22
+	then           shift, and enter state 24
 	"+"            shift, and enter state 10
 	"-"            shift, and enter state 11
 	"*"            shift, and enter state 12
 	"<="           shift, and enter state 13
-	">="           shift, and enter state 14
+	"+="           shift, and enter state 14
+	">="           shift, and enter state 15
 
 
 State 10
@@ -185,7 +193,7 @@ State 10
 	var            shift, and enter state 6
 	func           shift, and enter state 7
 
-	Exp            goto state 21
+	Exp            goto state 23
 
 State 11
 
@@ -197,7 +205,7 @@ State 11
 	var            shift, and enter state 6
 	func           shift, and enter state 7
 
-	Exp            goto state 20
+	Exp            goto state 22
 
 State 12
 
@@ -209,7 +217,7 @@ State 12
 	var            shift, and enter state 6
 	func           shift, and enter state 7
 
-	Exp            goto state 19
+	Exp            goto state 21
 
 State 13
 
@@ -221,11 +229,11 @@ State 13
 	var            shift, and enter state 6
 	func           shift, and enter state 7
 
-	Exp            goto state 18
+	Exp            goto state 20
 
 State 14
 
-	Exp -> Exp ">=" . Exp                               (rule 6)
+	Exp -> Exp "+=" . Exp                               (rule 6)
 
 	let            shift, and enter state 2
 	int            shift, and enter state 4
@@ -233,16 +241,28 @@ State 14
 	var            shift, and enter state 6
 	func           shift, and enter state 7
 
-	Exp            goto state 17
+	Exp            goto state 19
 
 State 15
 
-	Exp -> let var . "=" Exp in Exp                     (rule 1)
+	Exp -> Exp ">=" . Exp                               (rule 7)
 
-	"="            shift, and enter state 16
+	let            shift, and enter state 2
+	int            shift, and enter state 4
+	if             shift, and enter state 5
+	var            shift, and enter state 6
+	func           shift, and enter state 7
 
+	Exp            goto state 18
 
 State 16
+
+	Exp -> let var . "=" Exp in Exp                     (rule 1)
+
+	"="            shift, and enter state 17
+
+
+State 17
 
 	Exp -> let var "=" . Exp in Exp                     (rule 1)
 
@@ -252,16 +272,41 @@ State 16
 	var            shift, and enter state 6
 	func           shift, and enter state 7
 
-	Exp            goto state 28
+	Exp            goto state 30
 
-State 17
+State 18
 
 	Exp -> Exp . "+" Exp                                (rule 2)
 	Exp -> Exp . "-" Exp                                (rule 3)
 	Exp -> Exp . "*" Exp                                (rule 4)
 	Exp -> Exp . "<=" Exp                               (rule 5)
-	Exp -> Exp . ">=" Exp                               (rule 6)
-	Exp -> Exp ">=" Exp .                               (rule 6)
+	Exp -> Exp . "+=" Exp                               (rule 6)
+	Exp -> Exp . ">=" Exp                               (rule 7)
+	Exp -> Exp ">=" Exp .                               (rule 7)
+
+	in             reduce using rule 7
+	then           reduce using rule 7
+	else           reduce using rule 7
+	"+"            shift, and enter state 10
+	"-"            shift, and enter state 11
+	"*"            shift, and enter state 12
+	"<="           reduce using rule 7
+	"+="           shift, and enter state 14
+	">="           reduce using rule 7
+	")"            reduce using rule 7
+	","            reduce using rule 7
+	%eof           reduce using rule 7
+
+
+State 19
+
+	Exp -> Exp . "+" Exp                                (rule 2)
+	Exp -> Exp . "-" Exp                                (rule 3)
+	Exp -> Exp . "*" Exp                                (rule 4)
+	Exp -> Exp . "<=" Exp                               (rule 5)
+	Exp -> Exp . "+=" Exp                               (rule 6)
+	Exp -> Exp "+=" Exp .                               (rule 6)
+	Exp -> Exp . ">=" Exp                               (rule 7)
 
 	in             reduce using rule 6
 	then           reduce using rule 6
@@ -270,20 +315,22 @@ State 17
 	"-"            shift, and enter state 11
 	"*"            shift, and enter state 12
 	"<="           reduce using rule 6
+	"+="           shift, and enter state 14
 	">="           reduce using rule 6
 	")"            reduce using rule 6
 	","            reduce using rule 6
 	%eof           reduce using rule 6
 
 
-State 18
+State 20
 
 	Exp -> Exp . "+" Exp                                (rule 2)
 	Exp -> Exp . "-" Exp                                (rule 3)
 	Exp -> Exp . "*" Exp                                (rule 4)
 	Exp -> Exp . "<=" Exp                               (rule 5)
 	Exp -> Exp "<=" Exp .                               (rule 5)
-	Exp -> Exp . ">=" Exp                               (rule 6)
+	Exp -> Exp . "+=" Exp                               (rule 6)
+	Exp -> Exp . ">=" Exp                               (rule 7)
 
 	in             reduce using rule 5
 	then           reduce using rule 5
@@ -292,20 +339,22 @@ State 18
 	"-"            shift, and enter state 11
 	"*"            shift, and enter state 12
 	"<="           reduce using rule 5
+	"+="           shift, and enter state 14
 	">="           reduce using rule 5
 	")"            reduce using rule 5
 	","            reduce using rule 5
 	%eof           reduce using rule 5
 
 
-State 19
+State 21
 
 	Exp -> Exp . "+" Exp                                (rule 2)
 	Exp -> Exp . "-" Exp                                (rule 3)
 	Exp -> Exp . "*" Exp                                (rule 4)
 	Exp -> Exp "*" Exp .                                (rule 4)
 	Exp -> Exp . "<=" Exp                               (rule 5)
-	Exp -> Exp . ">=" Exp                               (rule 6)
+	Exp -> Exp . "+=" Exp                               (rule 6)
+	Exp -> Exp . ">=" Exp                               (rule 7)
 
 	in             reduce using rule 4
 	then           reduce using rule 4
@@ -314,20 +363,22 @@ State 19
 	"-"            reduce using rule 4
 	"*"            reduce using rule 4
 	"<="           reduce using rule 4
+	"+="           reduce using rule 4
 	">="           reduce using rule 4
 	")"            reduce using rule 4
 	","            reduce using rule 4
 	%eof           reduce using rule 4
 
 
-State 20
+State 22
 
 	Exp -> Exp . "+" Exp                                (rule 2)
 	Exp -> Exp . "-" Exp                                (rule 3)
 	Exp -> Exp "-" Exp .                                (rule 3)
 	Exp -> Exp . "*" Exp                                (rule 4)
 	Exp -> Exp . "<=" Exp                               (rule 5)
-	Exp -> Exp . ">=" Exp                               (rule 6)
+	Exp -> Exp . "+=" Exp                               (rule 6)
+	Exp -> Exp . ">=" Exp                               (rule 7)
 
 	in             reduce using rule 3
 	then           reduce using rule 3
@@ -336,20 +387,22 @@ State 20
 	"-"            reduce using rule 3
 	"*"            shift, and enter state 12
 	"<="           reduce using rule 3
+	"+="           reduce using rule 3
 	">="           reduce using rule 3
 	")"            reduce using rule 3
 	","            reduce using rule 3
 	%eof           reduce using rule 3
 
 
-State 21
+State 23
 
 	Exp -> Exp . "+" Exp                                (rule 2)
 	Exp -> Exp "+" Exp .                                (rule 2)
 	Exp -> Exp . "-" Exp                                (rule 3)
 	Exp -> Exp . "*" Exp                                (rule 4)
 	Exp -> Exp . "<=" Exp                               (rule 5)
-	Exp -> Exp . ">=" Exp                               (rule 6)
+	Exp -> Exp . "+=" Exp                               (rule 6)
+	Exp -> Exp . ">=" Exp                               (rule 7)
 
 	in             reduce using rule 2
 	then           reduce using rule 2
@@ -358,15 +411,16 @@ State 21
 	"-"            reduce using rule 2
 	"*"            shift, and enter state 12
 	"<="           reduce using rule 2
+	"+="           reduce using rule 2
 	">="           reduce using rule 2
 	")"            reduce using rule 2
 	","            reduce using rule 2
 	%eof           reduce using rule 2
 
 
-State 22
+State 24
 
-	Exp -> if Exp then . Exp else Exp                   (rule 7)
+	Exp -> if Exp then . Exp else Exp                   (rule 8)
 
 	let            shift, and enter state 2
 	int            shift, and enter state 4
@@ -374,54 +428,57 @@ State 22
 	var            shift, and enter state 6
 	func           shift, and enter state 7
 
-	Exp            goto state 27
+	Exp            goto state 29
 
-State 23
+State 25
 
 	Exp -> Exp . "+" Exp                                (rule 2)
 	Exp -> Exp . "-" Exp                                (rule 3)
 	Exp -> Exp . "*" Exp                                (rule 4)
 	Exp -> Exp . "<=" Exp                               (rule 5)
-	Exp -> Exp . ">=" Exp                               (rule 6)
-	Exps -> Exp .                                       (rule 11)
-	Exps -> Exp . "," Exps                              (rule 12)
+	Exp -> Exp . "+=" Exp                               (rule 6)
+	Exp -> Exp . ">=" Exp                               (rule 7)
+	Exps -> Exp .                                       (rule 12)
+	Exps -> Exp . "," Exps                              (rule 13)
 
 	"+"            shift, and enter state 10
 	"-"            shift, and enter state 11
 	"*"            shift, and enter state 12
 	"<="           shift, and enter state 13
-	">="           shift, and enter state 14
-	")"            reduce using rule 11
-	","            shift, and enter state 26
-
-
-State 24
-
-	Exp -> func "(" Exps . ")"                          (rule 8)
-
-	")"            shift, and enter state 25
-
-
-State 25
-
-	Exp -> func "(" Exps ")" .                          (rule 8)
-
-	in             reduce using rule 8
-	then           reduce using rule 8
-	else           reduce using rule 8
-	"+"            reduce using rule 8
-	"-"            reduce using rule 8
-	"*"            reduce using rule 8
-	"<="           reduce using rule 8
-	">="           reduce using rule 8
-	")"            reduce using rule 8
-	","            reduce using rule 8
-	%eof           reduce using rule 8
+	"+="           shift, and enter state 14
+	">="           shift, and enter state 15
+	")"            reduce using rule 12
+	","            shift, and enter state 28
 
 
 State 26
 
-	Exps -> Exp "," . Exps                              (rule 12)
+	Exp -> func "(" Exps . ")"                          (rule 9)
+
+	")"            shift, and enter state 27
+
+
+State 27
+
+	Exp -> func "(" Exps ")" .                          (rule 9)
+
+	in             reduce using rule 9
+	then           reduce using rule 9
+	else           reduce using rule 9
+	"+"            reduce using rule 9
+	"-"            reduce using rule 9
+	"*"            reduce using rule 9
+	"<="           reduce using rule 9
+	"+="           reduce using rule 9
+	">="           reduce using rule 9
+	")"            reduce using rule 9
+	","            reduce using rule 9
+	%eof           reduce using rule 9
+
+
+State 28
+
+	Exps -> Exp "," . Exps                              (rule 13)
 
 	let            shift, and enter state 2
 	int            shift, and enter state 4
@@ -429,44 +486,48 @@ State 26
 	var            shift, and enter state 6
 	func           shift, and enter state 7
 
-	Exp            goto state 23
-	Exps           goto state 31
+	Exp            goto state 25
+	Exps           goto state 33
 
-State 27
+State 29
 
 	Exp -> Exp . "+" Exp                                (rule 2)
 	Exp -> Exp . "-" Exp                                (rule 3)
 	Exp -> Exp . "*" Exp                                (rule 4)
 	Exp -> Exp . "<=" Exp                               (rule 5)
-	Exp -> Exp . ">=" Exp                               (rule 6)
-	Exp -> if Exp then Exp . else Exp                   (rule 7)
+	Exp -> Exp . "+=" Exp                               (rule 6)
+	Exp -> Exp . ">=" Exp                               (rule 7)
+	Exp -> if Exp then Exp . else Exp                   (rule 8)
 
-	else           shift, and enter state 30
+	else           shift, and enter state 32
 	"+"            shift, and enter state 10
 	"-"            shift, and enter state 11
 	"*"            shift, and enter state 12
 	"<="           shift, and enter state 13
-	">="           shift, and enter state 14
+	"+="           shift, and enter state 14
+	">="           shift, and enter state 15
 
 
-State 28
+State 30
 
 	Exp -> let var "=" Exp . in Exp                     (rule 1)
 	Exp -> Exp . "+" Exp                                (rule 2)
 	Exp -> Exp . "-" Exp                                (rule 3)
 	Exp -> Exp . "*" Exp                                (rule 4)
 	Exp -> Exp . "<=" Exp                               (rule 5)
-	Exp -> Exp . ">=" Exp                               (rule 6)
+	Exp -> Exp . "+=" Exp                               (rule 6)
+	Exp -> Exp . ">=" Exp                               (rule 7)
 
-	in             shift, and enter state 29
+	in             shift, and enter state 31
 	"+"            shift, and enter state 10
 	"-"            shift, and enter state 11
 	"*"            shift, and enter state 12
 	"<="           shift, and enter state 13
-	">="           shift, and enter state 14
+	"+="           shift, and enter state 14
+	">="           shift, and enter state 15
 
 
-State 29
+State 31
 
 	Exp -> let var "=" Exp in . Exp                     (rule 1)
 
@@ -476,11 +537,11 @@ State 29
 	var            shift, and enter state 6
 	func           shift, and enter state 7
 
-	Exp            goto state 33
+	Exp            goto state 35
 
-State 30
+State 32
 
-	Exp -> if Exp then Exp else . Exp                   (rule 7)
+	Exp -> if Exp then Exp else . Exp                   (rule 8)
 
 	let            shift, and enter state 2
 	int            shift, and enter state 4
@@ -488,45 +549,48 @@ State 30
 	var            shift, and enter state 6
 	func           shift, and enter state 7
 
-	Exp            goto state 32
+	Exp            goto state 34
 
-State 31
+State 33
 
-	Exps -> Exp "," Exps .                              (rule 12)
+	Exps -> Exp "," Exps .                              (rule 13)
 
-	")"            reduce using rule 12
+	")"            reduce using rule 13
 
 
-State 32
+State 34
 
 	Exp -> Exp . "+" Exp                                (rule 2)
 	Exp -> Exp . "-" Exp                                (rule 3)
 	Exp -> Exp . "*" Exp                                (rule 4)
 	Exp -> Exp . "<=" Exp                               (rule 5)
-	Exp -> Exp . ">=" Exp                               (rule 6)
-	Exp -> if Exp then Exp else Exp .                   (rule 7)
+	Exp -> Exp . "+=" Exp                               (rule 6)
+	Exp -> Exp . ">=" Exp                               (rule 7)
+	Exp -> if Exp then Exp else Exp .                   (rule 8)
 
-	in             reduce using rule 7
-	then           reduce using rule 7
-	else           reduce using rule 7
+	in             reduce using rule 8
+	then           reduce using rule 8
+	else           reduce using rule 8
 	"+"            shift, and enter state 10
 	"-"            shift, and enter state 11
 	"*"            shift, and enter state 12
 	"<="           shift, and enter state 13
-	">="           shift, and enter state 14
-	")"            reduce using rule 7
-	","            reduce using rule 7
-	%eof           reduce using rule 7
+	"+="           shift, and enter state 14
+	">="           shift, and enter state 15
+	")"            reduce using rule 8
+	","            reduce using rule 8
+	%eof           reduce using rule 8
 
 
-State 33
+State 35
 
 	Exp -> let var "=" Exp in Exp .                     (rule 1)
 	Exp -> Exp . "+" Exp                                (rule 2)
 	Exp -> Exp . "-" Exp                                (rule 3)
 	Exp -> Exp . "*" Exp                                (rule 4)
 	Exp -> Exp . "<=" Exp                               (rule 5)
-	Exp -> Exp . ">=" Exp                               (rule 6)
+	Exp -> Exp . "+=" Exp                               (rule 6)
+	Exp -> Exp . ">=" Exp                               (rule 7)
 
 	in             reduce using rule 1
 	then           reduce using rule 1
@@ -535,7 +599,8 @@ State 33
 	"-"            shift, and enter state 11
 	"*"            shift, and enter state 12
 	"<="           shift, and enter state 13
-	">="           shift, and enter state 14
+	"+="           shift, and enter state 14
+	">="           shift, and enter state 15
 	")"            reduce using rule 1
 	","            reduce using rule 1
 	%eof           reduce using rule 1
@@ -544,7 +609,7 @@ State 33
 -----------------------------------------------------------------------------
 Grammar Totals
 -----------------------------------------------------------------------------
-Number of rules: 13
-Number of terminals: 17
+Number of rules: 14
+Number of terminals: 18
 Number of non-terminals: 3
-Number of states: 34
+Number of states: 36
