@@ -24,7 +24,7 @@ tokens :-
     $digit+ { \s -> TInt (read s) }
 
     -- Symbole
-    "<=" | "+=" | ">=" | "=" | "+" | "*" | "(" | ")" | ","{ \s -> TSym s}
+    "<=" | ">=" | "=" | "+" | "*" | "(" | ")" | ","{ \s -> TSym s}
 
     -- Variable et fonction
     $lower+ { \s -> TVar s }
