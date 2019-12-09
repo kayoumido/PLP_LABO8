@@ -88,3 +88,9 @@ funcs =
 env :: ([(Name, Int)], [(Name, [Name], Exp)])
 env = ([("a", 1), ("b", 2), ("c", 3)], funcs)
 
+main = do
+  s <- getLine
+  print $ eval (parser $ lexer s) env
+  if null s
+    then return ()
+    else main
