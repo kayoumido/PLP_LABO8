@@ -1,11 +1,11 @@
 module Lab8 where
 
-import           Data.Char
-import           LexerMin
-import           ParserMin
+import LexerMin
+import ParserMin
 
 type Op = [Char]
 
+-- Search in a given environment for the value of a variable
 value name (vars, _) = value' name vars
     where
     value' name [] = error $ "Undefined variable: " ++ name
@@ -14,6 +14,7 @@ value name (vars, _) = value' name vars
         then val
         else value' name vars
 
+-- Search in a given environment for the definition of a function
 extract name (_, funcs) = extract' name funcs
     where
     extract' name [] = error $ "Undefined function: " ++ name
@@ -22,15 +23,20 @@ extract name (_, funcs) = extract' name funcs
         then (vars, body)
         else extract' name funcs
 
+-- Function to define boolean functions
 bool op x y =
     if (op x y)
     then 1
     else 0
 
+-- Expand an evironment w/ new variables
 expand env [] [] = env
 expand env (v:vs) (x:xs) = ((v, eval x env) : vars, funcs)
     where
     (vars, funcs) = expand env vs xs
+
+
+-- EVALUTORS
 
 eval (Cst n) _ = n
 eval (Var v) env = value v env
@@ -38,7 +44,8 @@ eval (Var v) env = value v env
 eval (Bin "+" a b) env = (eval a env) + (eval b env)
 eval (Bin "-" a b) env = (eval a env) - (eval b env)
 eval (Bin "*" a b) env = (eval a env) * (eval b env)
-eval (Bin "<" a b) env = bool (<) (eval a env) (eval b env)
+
+eval (Bin "<" a b) env  = bool (<) (eval a env) (eval b env)
 eval (Bin "<=" a b) env = bool (<=) (eval a env) (eval b env)
 eval (Bin ">=" a b) env = bool (>=) (eval a env) (eval b env)
 
@@ -47,33 +54,36 @@ eval (If p ifTrue ifFalse) env
     | otherwise = eval ifTrue env
 
 eval (Let n x y) env@(vars, funcs) = eval y ((n, eval x env) : vars, funcs)
-eval (Func func xs) env = eval body $ expand env vars xs
-    where
-    (vars, body) = extract func env
 
-funcs =
-    [ ("Succ", ["N"], Bin "+" (Var "N") (Cst 1)), 
-      ("Pred", ["N"], Bin "-" (Var "N") (Cst 1))
-    , ("Geoseries", ["N"], 
-        If
-            (Var "N")
+eval (Func func xs) env = eval body $ expand env vars xs
+    where (vars, body) = extract func env
+
+funcs = [
+    ("Succ", ["N"], Bin "+" (Var "N") (Cst 1)),
+    ("Pred", ["N"], Bin "-" (Var "N") (Cst 1)),
+    ("Geoseries", ["N"],
+        If (Var "N")
             (Bin "+" (Var "N") (Func "Geoseries" [Func "Pred" [Var "N"]]))
-            (Cst 0)),
-    ("Fibonacci", ["N"], 
-        If
-            (Bin "<=" (Var "N") (Cst 1))
+            (Cst 0)
+        ),
+    ("Fibonacci", ["N"],
+        If (Bin "<=" (Var "N") (Cst 1))
             (Var "N")
-            (Bin "+" (Func "Fibonacci" [Func "Pred" [Var "N"]]) (Func "Fibonacci" [Bin "-" (Var "N") (Cst 2)]))),
-    ("Fact", ["N"], 
-        If
-            (Var "N")
+            (Bin "+" (Func "Fibonacci" [Func "Pred" [Var "N"]]) (Func "Fibonacci" [Bin "-" (Var "N") (Cst 2)]))
+        ),
+    ("Fact", ["N"],
+        If (Var "N")
             (Bin "*" (Var "N") (Func "Fact" [Func "Pred" [Var "N"]]))
-            (Cst 1))
+            (Cst 1)
+        )
     ]
 
+-- ([Variables], [Function definitions])
 env :: ([(Name, Int)], [(Name, [Name], Exp)])
 env = ([("a", 1), ("b", 2), ("c", 3)], funcs)
 
+
+-- Main
 main = do
     s <- getLine
     print $ eval (parser $ lexer s) env

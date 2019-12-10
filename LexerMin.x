@@ -1,40 +1,60 @@
 {
--- Définition du nom du module et des exports.
-module LexerMin (lexer, Name, Token(..)) where
+module LexerMin (
+    lexer,
+    Name,
+    Token(..)
+) where
 }
 
--- Le wrapper définit le type de analyseur que Alex va générer.
+-- Define the type of wrapper used by Alex
 %wrapper "basic"
-$digit = 0-9 -- Macro pour définir les chiffres.
-$lower = [a-z] -- Macro pour définir les lettres minuscules.
-$upper = [A-Z] -- Macro pour définir les lettres majuscules.
 
--- Règles, chaque règle doit spécifier une lambda expression de type [Char] -> Token
+-- Define macros
+$digit = 0-9
+$lower = [a-z]
+$upper = [A-Z]
+
+-- Define Lexeme
 tokens :-
     $white+ ;
 
-    -- mot clé
-    let { \s -> TLet }
-    in { \s -> TIn }
-    if { \s -> TIf}
-    then {\s -> TThen}
-    else { \s -> TElse}
+    -- General Keywords
+    let     { \s -> TLet    }
+    in      { \s -> TIn     }
+    if      { \s -> TIf     }
+    then    { \s -> TThen   }
+    else    { \s -> TElse   }
 
-    -- literaux
-    $digit+ { \s -> TInt (read s) }
+    -- Operators & special symbols
+    "<="
+    | ">="
+    | "="
+    | "+"
+    | "*"
+    | "("
+    | ")"
+    | "," { \s -> TSym s }
 
-    -- Symbole
-    "<=" | ">=" | "=" | "+" | "*" | "(" | ")" | ","{ \s -> TSym s}
-
-    -- Variable et fonction
-    $lower+ { \s -> TVar s }
-    $upper$lower* { \s -> TFunc s}
+    -- Constants, Variables and Function
+    $digit+                         { \s -> TInt (read s)   }
+    $lower[$lower$upper$digit\_]*   { \s -> TVar s          }
+    $upper[$lower$upper$digit\_]*   { \s -> TFunc s         }
 
 {
--- Définition du type Token.
 type Name = [Char]
-data Token = TLet | TIn | TSym [Char] | TVar Name | TInt Int | TFunc Name | TIf | TThen | TElse deriving (Eq,Show)
+data Token =
+    TLet
+    | TIn
+    | TSym [Char]
+    | TVar Name
+    | TInt Int
+    | TFunc Name
+    | TIf
+    | TThen
+    | TElse
+    deriving (Eq,Show)
 
--- Alias du nom de la fonction d'analyse lexicale.
+-- Set alias for the complicated alex function
+--  What were they thinking w/ a name like that ?!
 lexer = alexScanTokens
 }
