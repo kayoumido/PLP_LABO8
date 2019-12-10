@@ -50,6 +50,7 @@ Exp : let var "=" Exp in Exp    { Let $2 $4 $6      }
 | Exp "*" Exp                   { Bin "*" $1 $3     }
 | Exp "<=" Exp                  { Bin "<=" $1 $3    }
 | Exp ">=" Exp                  { Bin ">=" $1 $3    }
+| Exp "<" Exp                   { Bin "<" $1 $3    }
 | if Exp then Exp else Exp      { If $2 $4 $6       }
 | func  "(" Exps ")"            { Func $1 $3        }
 | int                           { Cst $1            }
