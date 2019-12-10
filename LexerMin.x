@@ -26,9 +26,11 @@ tokens :-
     else    { \s -> TElse   }
 
     -- Operators & special symbols
-    "<="
+    "<"
+    | "<="
     | ">="
     | "="
+    | "-"
     | "+"
     | "*"
     | "("
