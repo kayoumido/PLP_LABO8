@@ -86,7 +86,9 @@ env = ([("a", 1), ("b", 2), ("c", 3)], funcs)
 -- Main
 main = do
     s <- getLine
-    print $ eval (parser $ lexer s) env
+    putStrLn $ show $ eval (parser $ lexer s) env
     if null s
-    then return ()
-    else main
+    then
+        return ()
+    else
+        main
