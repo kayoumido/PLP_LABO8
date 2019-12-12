@@ -81,6 +81,6 @@ data Exp =
     | Var Name
     | If Exp Exp Exp
     | Func Name [Exp]
-    | Def Name Name [Exp]
+    | Def Name [Name] Exp
     deriving Show
 }
