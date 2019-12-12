@@ -17,6 +17,7 @@ import LexerMin
     if      { TIf       }
     then    { TThen     }
     else    { TElse     }
+    def     { TDef $$   }
 
     -- Variable and functions
     var     { TVar $$   }
@@ -29,6 +30,7 @@ import LexerMin
     "*"     { TSym "*"  }
     "<="    { TSym "<=" }
     ">="    { TSym ">=" }
+    "<"     { TSym "<"  }
     "("     { TSym "("  }
     ")"     { TSym ")"  }
     ","     { TSym ","  }
@@ -37,13 +39,17 @@ import LexerMin
 %right in
 %right else
 
-%left "<=" ">="
-%right "+="
+%left "<=" ">=" "<"
 %left "+" "-"
 %left "*"
 %%
 
 -- Grammar rules
+Line : Def {$1}
+    | Exp {$1}
+
+Def : def func Vars "=" Exp {Def $2 $3 $5}
+
 Exp : let var "=" Exp in Exp    { Let $2 $4 $6      }
 | Exp "+" Exp                   { Bin "+" $1 $3     }
 | Exp "-" Exp                   { Bin "-" $1 $3     }
@@ -60,6 +66,9 @@ Exp : let var "=" Exp in Exp    { Let $2 $4 $6      }
 Exps : Exp      { [$1]  }
 | Exp "," Exps  { $1:$3 } -- Convert expressions sparated by `,` into a list
 
+Vars : var {[$1]}
+| var Vars {$1:$2}
+
 {
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
@@ -72,5 +81,6 @@ data Exp =
     | Var Name
     | If Exp Exp Exp
     | Func Name [Exp]
+    | Def Name Name [Exp]
     deriving Show
 }

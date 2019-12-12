@@ -29,12 +29,10 @@ bool op x y =
     then 1
     else 0
 
--- Expand an evironment w/ new variables
-expand env [] [] = env
-expand env (v:vs) (x:xs) = ((v, eval x env) : vars, funcs)
-    where
-    (vars, funcs) = expand env vs xs
-
+-- expand an evironment w/ new variables
+expandVar env [] [] = env
+expandVar env (v:vs) (x:xs) = ((v, eval x env) : vars, funcs)
+    where (vars, funcs) = expandVar env vs xs
 
 -- EVALUTORS
 
@@ -52,11 +50,13 @@ eval (Bin ">=" a b) env = bool (>=) (eval a env) (eval b env)
 eval (If p ifTrue ifFalse) env
     | eval p env < 1 = eval ifFalse env
     | otherwise = eval ifTrue env
+    
 
 eval (Let n x y) env@(vars, funcs) = eval y ((n, eval x env) : vars, funcs)
 
-eval (Func func xs) env = eval body $ expand env vars xs
+eval (Func func xs) env = eval body $ expandVar env vars xs
     where (vars, body) = extract func env
+
 
 funcs = [
     ("Succ", ["N"], Bin "+" (Var "N") (Cst 1)),
@@ -85,8 +85,13 @@ env = ([("a", 1), ("b", 2), ("c", 3)], funcs)
 
 -- Main
 main = do
+    putStr "SLP>"
     s <- getLine
-    putStrLn $ show $ eval (parser $ lexer s) env
+    let tokens = lexer s 
+    putStrLn $ show tokens
+    let ast = parser tokens
+    putStrLn $ show ast
+    putStrLn $ show $ eval (ast) env
     if null s
     then
         return ()
