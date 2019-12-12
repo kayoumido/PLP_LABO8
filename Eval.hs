@@ -57,6 +57,7 @@ eval (Let n x y) env@(vars, funcs) = eval y ((n, eval x env) : vars, funcs)
 eval (Func func xs) env = eval body $ expandVar env vars xs
     where (vars, body) = extract func env
 
+-- expand an evironment w/ new function
 def (Def name n body) env@(vars, funcs) = (vars, (name, n, body):funcs)
 
 funcs = [
@@ -86,19 +87,21 @@ env = ([("a", 1), ("b", 2), ("c", 3)], funcs)
 
 -- Main
 main env = do
-    putStr "SLP>"
+    putStr "SLP> "
     s <- getLine
-    let tokens = lexer s 
-    putStrLn $ show tokens
-    let ast = parser tokens
-    putStrLn $ show ast
-    
+
     if null s
         then
             return ()
         else do
+            let tokens = lexer s 
+            putStrLn $ show tokens
+            let ast = parser tokens
+            putStrLn $ show ast
             case ast of
-                (Def name vars body) -> main (def ast env)
+                (Def name vars body) -> do
+                    putStrLn $ show name
+                    main (def ast env) 
                 _ -> do
                     putStrLn $ show $ eval ast env
                     main env
