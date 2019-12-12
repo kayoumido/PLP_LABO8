@@ -24,6 +24,7 @@ tokens :-
     if      { \s -> TIf     }
     then    { \s -> TThen   }
     else    { \s -> TElse   }
+    def     { \s -> TDef s  }
 
     -- Operators & special symbols
     "<"
@@ -54,6 +55,7 @@ data Token =
     | TIf
     | TThen
     | TElse
+    | TDef Name
     deriving (Eq,Show)
 
 -- Set alias for the complicated alex function
